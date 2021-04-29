@@ -1,4 +1,4 @@
-.new-button {
+.button-class {
   background-color: #4caf50; /* Green */
   border: none;
   color: white;
@@ -14,4 +14,8 @@
   background-color: white;
   color: black;
   border: 2px solid #4caf50;
+}
+
+.pokemon-list {
+  list-style: none;
 }

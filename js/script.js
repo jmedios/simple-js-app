@@ -1,105 +1,117 @@
-const pokemonRepository = (function () {
-  // Pokemon array
-  const pokemonList = [
-    {
-      name: "Bulbasaur",
-      height: 0.7,
-      types: ["grass", "poison"],
-    },
-    {
-      name: "Squirtle",
-      height: 1,
-      types: ["water"],
-    },
-    {
-      name: "Charmander",
-      height: 2,
-      types: ["fire"],
-    },
-  ];
+let pokemonRepository = (function () {
+  let pokemonList = [];
+  let apiUrl = "https://pokeapi.co/api/v2/pokemon/?limit=150";
+
+  function add(pokemon) {
+    typeof pokemon === "object" && "name" in pokemon
+      ? pokemonList.push(pokemon)
+      : console.log("pokemon is not correct");
+  }
+
+  function getAll() {
+    return pokemonList;
+  }
+
+  function addListItem(pokemon) {
+    //to select pokemon-list class
+    const pokemonList = document.querySelector(".pokemon-list");
+    //to create list
+    const listpokemon = document.createElement("li");
+    //to create button
+    const button = document.createElement("button");
+    //sets button name to pokemon name
+    button.innerText = pokemon.name;
+    //sets button class to button-class
+    button.classList.add("button-class");
+    //adds a button to the end of list
+    listpokemon.appendChild(button);
+    //adds list to the ul section
+    pokemonList.appendChild(listpokemon);
+    //button behaviour
+    button.addEventListener("click", function (event) {
+      //triggers showDetails function
+      showDetails(pokemon);
+    });
+  }
+
+  function loadList() {
+    //promise to get pokeapi data from url
+    return (
+      fetch(apiUrl)
+        .then(function (response) {
+          //converts response to json
+          return response.json();
+        })
+        //drills down into the response to grab the data
+        .then(function (json) {
+          //for each result, gathers only the name and itemurl into an object called pokemon
+          json.results.forEach(function (item) {
+            let pokemon = {
+              name: item.name,
+              detailsUrl: item.url,
+            };
+            //uses the add function to push the pokemon object into the pokemonList array
+            add(pokemon);
+            //also logs each new object to the console
+            console.log(pokemon);
+          });
+        })
+        //if unsuccessful, logs the error to console
+        .catch(function (e) {
+          console.error(e);
+        })
+    );
+  }
+
+  function showDetails(item) {
+    //calls loadDetails function
+    pokemonRepository.loadDetails(item).then(function () {
+      console.log(item);
+    });
+  }
+
+  //function for drill down detail of pokemon after button click
+  function loadDetails(item) {
+    const url = item.detailsUrl;
+    //drill down promise fetch for info from each pokemon's detailsUrl
+    return (
+      fetch(url)
+        .then(function (response) {
+          //converts response to json
+          return response.json();
+        })
+        //drills down into the response to grab the data that's needed
+        .then(function (details) {
+          // what in the world does this do??
+          item.imageUrl = details.sprites.front_default;
+          item.height = details.height;
+          item.types = details.types;
+        })
+        //logs error to the console
+        .catch(function (e) {
+          console.error(e);
+        })
+    );
+  }
 
   return {
-    getAll: function () {
-      return pokemonList;
-    },
-
-    // Taking a stab at this. Not sure if it works.
-    add: function (pokemon) {
-      typeof pokemon === "object" &&
-      Object.keys(pokemon) === Object.keys(pokemonList)
-        ? pokemonList.push(pokemon)
-        : alert("Not an object.");
-    },
-
-    addListItem: function (pokemon) {
-      // selects the unordered list w/ class = pokemon-list
-      const pokeList = document.querySelector(".pokemon-list");
-
-      // creates list
-      const li = document.createElement("li");
-
-      // creates button
-      const button = document.createElement("button");
-
-      // button styling
-      button.innerText = pokemon.name;
-      button.classList.add("new-button");
-
-      // button behaviour
-      button.addEventListener("click", function () {
-        pokemonRepository.showDetails(pokemon);
-      });
-
-      // build list
-      li.appendChild(button);
-      pokeList.appendChild(li);
-    },
-
-    showDetails: function (pokemon) {
-      console.log(pokemon);
-    },
-
-    //     // Also trying this one out. Doesn't seem to work.
-    // filter: function(query){
-    //     return pokemonList.filter(el => el.toLowerCase().indexOf(query.toLowerCase()) !== -1)
-    // }
+    add: add,
+    getAll: getAll,
+    addListItem: addListItem,
+    loadList: loadList,
+    loadDetails: loadDetails,
+    showDetails: showDetails,
   };
 })();
 
-// creating new array test to duplicate pokemonList array. Didn't work.
-//const newArr = [...pokemonRepository.getAll()];
+//--------------------------------------------------
 
-// The original for loop that was inside the IIFE
-/*   // For loop that lists out the Pokemon's name and it's height
-    for (let i = 0; i < pokemonList.length; i++) {
-        document.write(pokemonList[i].name + ' (height: ' + pokemonList[i].height + ') ')
-    } */
-
-// console.log test to see what pokemon is pulling
-// pokemonRepository.getAll().forEach(pokemon => {
-//     console.log(pokemon)
-// });
-
-pokemonRepository.getAll().forEach((pokemon) => {
-  // document.write(`${pokemon.name} (height: ${pokemon.height}) `)
-  //   const pokemonList = document.querySelector(".pokemon-list");
-  //   const li = document.createElement("li");
-  //   const button = document.createElement("button");
-  //   button.innerText = pokemon.name;
-
-  //   button.classList.add("new-button");
-  //   li.appendChild(button);
-  //   pokemonList.appendChild(li);
-  pokemonRepository.addListItem(pokemon);
-});
-
-// The original while loop that was inside the IIFE
-/*  // While loop that will call out "Wow, that's big!" for Pokemon's w/ height >= 1
-    i = 0;
-
-    while (i < pokemonList.length) {
-    // ternary test
-        pokemonList[i].height >= 1 ? document.write(pokemonList[i].name + ' (height: ' + pokemonList[i].height + ') - Wow, that\'s big!') : document.write(pokemonList[i].name + ' (height: ' + pokemonList[i].height + ')');
-        i++;
-
-    }  */
+//function to compile array from the external pokemon api data
+pokemonRepository
+  .loadList()
+  //get obj in arr and for each obj, add it to the list
+  .then(function () {
+    pokemonRepository.getAll().forEach(function (pokemon) {
+      pokemonRepository.addListItem(pokemon);
+    });
+  });
