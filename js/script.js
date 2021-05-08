@@ -1,6 +1,6 @@
-let pokemonRepository = (function () {
-  let pokemonList = [];
-  let apiUrl = "https://pokeapi.co/api/v2/pokemon/?limit=150";
+const pokemonRepository = (function () {
+  const pokemonList = [];
+  const apiUrl = "https://pokeapi.co/api/v2/pokemon/?limit=150";
 
   function add(pokemon) {
     typeof pokemon === "object" && "name" in pokemon
@@ -20,7 +20,8 @@ let pokemonRepository = (function () {
     //to create button
     const button = document.createElement("button");
     //sets button name to pokemon name
-    button.innerText = pokemon.name;
+    button.innerText =
+      pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
     //sets button class to button-class
     button.classList.add("button-class");
     //adds a button to the end of list
@@ -46,14 +47,14 @@ let pokemonRepository = (function () {
         .then(function (json) {
           //for each result, gathers only the name and itemurl into an object called pokemon
           json.results.forEach(function (item) {
-            let pokemon = {
+            const pokemon = {
               name: item.name,
               detailsUrl: item.url,
             };
             //uses the add function to push the pokemon object into the pokemonList array
             add(pokemon);
             //also logs each new object to the console
-            console.log(pokemon);
+            //console.log(pokemon);
           });
         })
         //if unsuccessful, logs the error to console
@@ -66,7 +67,66 @@ let pokemonRepository = (function () {
   function showDetails(item) {
     //calls loadDetails function
     pokemonRepository.loadDetails(item).then(function () {
-      console.log(item);
+      //modal
+      //selects the modal-container div
+      const modalContainer = document.querySelector("#modal-container");
+
+      function showModal(title) {
+        modalContainer.innerHTML = "";
+
+        const modal = document.createElement("div");
+        modal.classList.add("modal");
+
+        const closeButtonElement = document.createElement("button");
+        closeButtonElement.classList.add("modal-close");
+        closeButtonElement.innerText = "X";
+        closeButtonElement.addEventListener("click", hideModal);
+
+        const titleElement = document.createElement("h1");
+        titleElement.innerText = title;
+
+        const contentElement = document.createElement("p");
+        contentElement.innerText = `
+        Height: ${item.height}
+        Weight: ${item.weight}
+        Types: ${item.types}
+        Abilities: ${item.abilities}`;
+
+        const pokeImage = document.createElement("img");
+        pokeImage.src = `${item.imageUrl}`;
+
+        modal.appendChild(closeButtonElement);
+        modal.appendChild(titleElement);
+        modal.appendChild(pokeImage);
+        modal.appendChild(contentElement);
+        modalContainer.appendChild(modal);
+
+        modalContainer.classList.add("is-visible");
+      }
+
+      function hideModal() {
+        modalContainer.classList.remove("is-visible");
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          modalContainer.classList.contains("is-visible")
+        ) {
+          hideModal();
+        }
+      });
+
+      modalContainer.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target === modalContainer) {
+          hideModal();
+        }
+      });
+
+      document.querySelector(".pokemon-list").addEventListener("click", () => {
+        showModal(`${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`);
+      });
     });
   }
 
@@ -82,10 +142,20 @@ let pokemonRepository = (function () {
         })
         //drills down into the response to grab the data that's needed
         .then(function (details) {
-          // what in the world does this do??
           item.imageUrl = details.sprites.front_default;
           item.height = details.height;
-          item.types = details.types;
+          item.weight = details.weight;
+          //item.types = [...details.types]; <-- this doesn't work
+          //item.abilities = [...details.abilities]; <-- this doesn't work either
+          item.types = [];
+          for (let i = 0; i < details.types.length; i++) {
+            item.types.push(details.types[i].type.name);
+          }
+
+          item.abilities = [];
+          for (let i = 0; i < details.abilities.length; i++) {
+            item.abilities.push(details.abilities[i].ability.name);
+          }
         })
         //logs error to the console
         .catch(function (e) {
@@ -105,7 +175,6 @@ let pokemonRepository = (function () {
 })();
 
 //--------------------------------------------------
-
 //function to compile array from the external pokemon api data
 pokemonRepository
   .loadList()
