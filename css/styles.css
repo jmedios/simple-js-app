@@ -5,6 +5,8 @@ html {
 .navbar-header {
   text-align: center;
   color: yellow;
+  font-family: "Press Start 2P", cursive;
+  font-size: 40px;
 }
 
 .btn-4 {
@@ -34,9 +36,9 @@ html {
 }
 
 .button-text {
-  font-weight: bold;
-  font-size: medium;
+  font-size: 18px;
   text-align: center;
+  font-family: "Roboto", sans-serif;
 }
 
 .pokemon-list {
@@ -99,4 +101,28 @@ html {
 
 .modal p {
   margin-bottom: 0;
+}
+
+@media all and (max-width: 1000px) {
+  .pokemon-list {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+@media all and (max-width: 850px) {
+  .pokemon-list {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media all and (max-width: 750px) {
+  .pokemon-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media all and (max-width: 500px) {
+  .pokemon-list {
+    grid-template-columns: 1fr;
+  }
 }
