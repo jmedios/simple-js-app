@@ -20,10 +20,15 @@ const pokemonRepository = (function () {
     //to create button
     const button = document.createElement("button");
     //sets button name to pokemon name
-    button.innerText =
-      pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+    button.innerHTML = `
+    <img width="60px" style="float:left;" src="${
+      pokemon.imageUrl
+    }"> <p class="button-text">${
+      pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
+    }</p>`;
+
     //sets button class to button-class
-    button.classList.add("button-class");
+    button.classList.add("btn-4");
     //adds a button to the end of list
     listpokemon.appendChild(button);
     //adds list to the ul section
@@ -46,10 +51,13 @@ const pokemonRepository = (function () {
         //drills down into the response to grab the data
         .then(function (json) {
           //for each result, gathers only the name and itemurl into an object called pokemon
-          json.results.forEach(function (item) {
+          json.results.forEach(function (item, index) {
             const pokemon = {
               name: item.name,
               detailsUrl: item.url,
+              imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
+                index + 1
+              }.png`,
             };
             //uses the add function to push the pokemon object into the pokemonList array
             add(pokemon);
