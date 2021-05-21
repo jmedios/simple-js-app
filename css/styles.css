@@ -1,4 +1,4 @@
-html {
+/* html {
   background-color: #d52c3e;
 }
 
@@ -41,15 +41,6 @@ html {
   font-family: "Roboto", sans-serif;
 }
 
-.pokemon-list {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
-  align-items: center;
-  justify-items: center;
-}
-
 #modal-container {
   display: none;
 }
@@ -65,12 +56,12 @@ html {
   background: rgba(0, 0, 0, 0.5);
 
   /* to show it above other content */
-  z-index: 999;
+z-index: 999;
 
-  /* to allow scrolling if the screen is not high enough*/
-  overflow: auto;
+/* to allow scrolling if the screen is not high enough*/
+overflow: auto;
 
-  /* this is used to center the modal */
+/* this is used to center the modal 
   display: grid;
   text-align: center;
 }
@@ -127,7 +118,7 @@ html {
   .pokemon-list {
     grid-template-columns: 1fr;
   }
-}
+} */
 
 * {
   -webkit-box-sizing: border-box;
@@ -189,4 +180,18 @@ html {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.pokemon-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  align-items: center;
+  justify-items: center;
+}
+
+.btn {
+  padding: 12px 16px; /* Some padding */
+  width: 200px;
 }

@@ -21,14 +21,26 @@ const pokemonRepository = (function () {
     const button = document.createElement("button");
     //sets button name to pokemon name
     button.innerHTML = `
-    <img width="60px" style="float:left;" src="${
+    <center><img width="60px" style="float:left;" src="${
       pokemon.imageUrl
-    }"> <p class="button-text">${
+    }"> <b>${
       pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-    }</p>`;
+    }</b></center>`;
 
     //sets button class to button-class
-    button.classList.add("btn-4");
+    button.classList.add(
+      "btn",
+      "btn-sm",
+      "btn-primary",
+      "list-group-item",
+      "list-group-item-action",
+      "list-group-item-dark"
+    );
+
+    //set button attributes for bootstrap modal
+    button.setAttribute("data-target", "#exampleModal");
+    button.setAttribute("data-toggle", "modal");
+
     //adds a button to the end of list
     listpokemon.appendChild(button);
     //adds list to the ul section
@@ -72,7 +84,7 @@ const pokemonRepository = (function () {
     );
   }
 
-  const modalContainer = document.querySelector("#modal-container");
+  // const modalContainer = document.querySelector("#modal-container");
   function showDetails(item) {
     //calls loadDetails function
     pokemonRepository.loadDetails(item).then(function () {
@@ -82,45 +94,75 @@ const pokemonRepository = (function () {
     });
   }
   function showModal(item) {
-    modalContainer.innerHTML = "";
-    const modal = document.createElement("div");
-    modal.classList.add("modal");
-    const closeButtonElement = document.createElement("button");
-    closeButtonElement.classList.add("modal-close");
-    closeButtonElement.innerText = "X";
-    closeButtonElement.addEventListener("click", hideModal);
-    const titleElement = document.createElement("h1");
-    titleElement.innerText =
-      item.name.charAt(0).toUpperCase() + item.name.slice(1);
-    const contentElement = document.createElement("p");
-    contentElement.innerText = `
-    Height: ${item.height}
-    Weight: ${item.weight}
-    Types: ${item.types}
-    Abilities: ${item.abilities}`;
-    const pokeImage = document.createElement("img");
-    pokeImage.src = `${item.imageUrl}`;
-    modal.appendChild(closeButtonElement);
-    modal.appendChild(titleElement);
-    modal.appendChild(pokeImage);
-    modal.appendChild(contentElement);
-    modalContainer.appendChild(modal);
-    modalContainer.classList.add("is-visible");
+    const modalTitle = $(".modal-title");
+    const modalBody = $(".modal-body");
+
+    //init
+    modalTitle.empty();
+    modalBody.empty();
+
+    //define
+    const nameElement = $(
+      "<h1>" + item.name.charAt(0).toUpperCase() + item.name.slice(1) + "</h1>"
+    );
+    const imageElementFront = $('<img class="modal-img" style="width:50%">');
+    const imageElementBack = $('<img class="modal-img" style="width:50%">');
+    imageElementFront.attr("src", item.imageUrlFront);
+    imageElementBack.attr("src", item.imageUrlBack);
+    const heightElement = $("<p>" + "Height: " + item.height + "</p>");
+    const weightElement = $("<p>" + "Weight: " + item.weight + "</p>");
+    const typesElement = $("<p>" + "Types: " + item.types + "</p>");
+    const abilitiesElement = $("<p>" + "Abilities: " + item.abilities + "</p>");
+
+    modalTitle.append(nameElement);
+    modalBody.append(imageElementFront);
+    modalBody.append(imageElementBack);
+    modalBody.append(heightElement);
+    modalBody.append(weightElement);
+    modalBody.append(typesElement);
+    modalBody.append(abilitiesElement);
+
+    // modalContainer.innerHTML = "";
+    // const modal = document.createElement("div");
+    // modal.classList.add("modal");
+    // const closeButtonElement = document.createElement("button");
+    // closeButtonElement.classList.add("modal-close");
+    // closeButtonElement.innerText = "X";
+    // closeButtonElement.addEventListener("click", hideModal);
+    // const titleElement = document.createElement("h1");
+    // titleElement.innerText =
+    //   item.name.charAt(0).toUpperCase() + item.name.slice(1);
+    // const contentElement = document.createElement("p");
+    // contentElement.innerText = `
+    // Height: ${item.height}
+    // Weight: ${item.weight}
+    // Types: ${item.types}
+    // Abilities: ${item.abilities}`;
+    // const pokeImage = document.createElement("img");
+    // pokeImage.src = `${item.imageUrl}`;
+
+    // modal.appendChild(closeButtonElement);
+    // modal.appendChild(titleElement);
+    // modal.appendChild(pokeImage);
+    // modal.appendChild(contentElement);
+    // modalContainer.appendChild(modal);
+    // modalContainer.classList.add("is-visible");
   }
-  function hideModal() {
-    modalContainer.classList.remove("is-visible");
-  }
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modalContainer.classList.contains("is-visible")) {
-      hideModal();
-    }
-  });
-  modalContainer.addEventListener("click", (e) => {
-    const target = e.target;
-    if (target === modalContainer) {
-      hideModal();
-    }
-  });
+
+  // function hideModal() {
+  //   modalContainer.classList.remove("is-visible");
+  // }
+  // window.addEventListener("keydown", (e) => {
+  //   if (e.key === "Escape" && modalContainer.classList.contains("is-visible")) {
+  //     hideModal();
+  //   }
+  // });
+  // modalContainer.addEventListener("click", (e) => {
+  //   const target = e.target;
+  //   if (target === modalContainer) {
+  //     hideModal();
+  //   }
+  // });
 
   //function for drill down detail of pokemon after button click
   function loadDetails(item) {
@@ -134,7 +176,8 @@ const pokemonRepository = (function () {
         })
         //drills down into the response to grab the data that's needed
         .then(function (details) {
-          item.imageUrl = details.sprites.front_default;
+          item.imageUrlFront = details.sprites.front_default;
+          item.imageUrlBack = details.sprites.back_default;
           item.height = details.height;
           item.weight = details.weight;
           //item.types = [...details.types]; <-- this doesn't work
